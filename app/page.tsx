@@ -4,11 +4,8 @@ import { useState, useEffect } from "react"
 import { UserProfile } from "./components/user-profile"
 import { Recommendations } from "./components/recommendations"
 import { WelcomeLoader } from "./components/welcome-loader"
-import { AuthForm } from "./components/auth/auth-form"
-import { useAuth } from "./components/auth/auth-provider"
-import { BookOpen, User, Award, Sparkles, LogOut, Loader2 } from "lucide-react"
+import { BookOpen, User, Award, Sparkles } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 
 interface UserProfileData {
@@ -19,7 +16,6 @@ interface UserProfileData {
 }
 
 export default function Dashboard() {
-  const { user, loading: authLoading, signOut } = useAuth()
   const [userProfile, setUserProfile] = useState<UserProfileData>({
     interests: "",
     performance: "",
@@ -28,8 +24,6 @@ export default function Dashboard() {
   })
   const [isLoaded, setIsLoaded] = useState(false)
   const [activeTab, setActiveTab] = useState("profile")
-  // Add state for sign out loading
-  const [signingOut, setSigningOut] = useState(false)
 
   useEffect(() => {
     // Set loaded state after initial animations
@@ -63,32 +57,6 @@ export default function Dashboard() {
     visible: { y: 0, opacity: 1, transition: { duration: 0.5 } },
   }
 
-  // Show loading state while checking authentication
-  if (authLoading) {
-    return <WelcomeLoader />
-  }
-
-  // Show auth form if user is not authenticated
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-50 p-4">
-        <AuthForm />
-      </div>
-    )
-  }
-
-  // Update the sign out handler
-  const handleSignOut = async () => {
-    setSigningOut(true)
-    try {
-      await signOut()
-    } catch (error) {
-      console.error("Sign out failed:", error)
-    } finally {
-      setSigningOut(false)
-    }
-  }
-
   return (
     <>
       <WelcomeLoader />
@@ -116,21 +84,9 @@ export default function Dashboard() {
                   Learning Dashboard
                 </span>
               </h1>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-1 text-sm bg-blue-50 px-3 py-1 rounded-full text-blue-700 border border-blue-100">
-                  <Sparkles className="h-4 w-4 text-blue-500 mr-1" />
-                  <span>Welcome, {user.user_metadata?.full_name || user.email}</span>
-                </div>
-                <Button
-                  onClick={handleSignOut}
-                  disabled={signingOut}
-                  variant="outline"
-                  size="sm"
-                  className="border-blue-200 text-blue-700 hover:bg-blue-50"
-                >
-                  {signingOut ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <LogOut className="h-4 w-4 mr-2" />}
-                  {signingOut ? "Signing out..." : "Sign Out"}
-                </Button>
+              <div className="flex items-center space-x-1 text-sm bg-blue-50 px-3 py-1 rounded-full text-blue-700 border border-blue-100">
+                <Sparkles className="h-4 w-4 text-blue-500 mr-1" />
+                <span>Public Access</span>
               </div>
             </div>
           </div>

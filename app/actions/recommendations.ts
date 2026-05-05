@@ -3,7 +3,11 @@
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import axios from 'axios'
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINIAI!)
+function getGenAI(): GoogleGenerativeAI | null {
+  const apiKey = process.env.GEMINIAI
+  if (!apiKey || !apiKey.trim()) return null
+  return new GoogleGenerativeAI(apiKey)
+}
 
 interface Recommendation {
   title: string
@@ -21,6 +25,9 @@ interface UserProfileData {
 
 export async function getRecommendations(profileData: UserProfileData): Promise<Recommendation[]> {
   try {
+    const genAI = getGenAI()
+    if (!genAI) return getDefaultRecommendations(profileData)
+
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" })
 
     const prompt = `
